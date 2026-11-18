@@ -1,0 +1,6 @@
+{
+  "name": "Veri-Fi",
+  "description": "Veri-Fi — Bet. Chat. Win. Social betting and peer-to-peer challenge platform powered by Solana Anchor smart-contract escrow.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

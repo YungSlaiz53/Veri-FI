@@ -1,0 +1,260 @@
+{
+  "entities": {
+    "UserPublic": {
+      "title": "UserPublic",
+      "description": "Publicly visible social profile and challenge statistics (no PII).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "username": { "type": "string", "minLength": 3, "maxLength": 32, "pattern": "^[a-zA-Z0-9_]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "nickname": { "type": "string", "maxLength": 32 },
+        "bio": { "type": "string", "maxLength": 280 },
+        "avatarUrl": { "type": "string", "maxLength": 512 },
+        "showStats": { "type": "boolean" },
+        "completedChallenges": { "type": "integer" },
+        "wins": { "type": "integer" },
+        "losses": { "type": "integer" },
+        "followingIds": { "type": "array" },
+        "referralCode": { "type": "string", "minLength": 4, "maxLength": 24, "pattern": "^[A-Z0-9_\\-]+$" },
+        "status": { "type": "string", "enum": ["active", "suspended", "deletion_requested"] },
+        "isOnline": { "type": "boolean" },
+        "joinedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "username", "displayName", "showStats", "completedChallenges", "wins", "losses", "referralCode", "status", "joinedAt", "updatedAt"]
+    },
+    "UserPrivate": {
+      "title": "UserPrivate",
+      "description": "Isolated private user PII, security settings, and responsible-use controls.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "maxLength": 254 },
+        "ageVerified": { "type": "boolean" },
+        "jurisdictionCode": { "type": "string", "maxLength": 16 },
+        "dailyStakeLimitSol": { "type": "number" },
+        "selfExcludedUntil": { "type": "string", "maxLength": 64 },
+        "blockedUserIds": { "type": "array" },
+        "connectedSolanaPubkey": { "type": "string", "maxLength": 64 },
+        "walletVerified": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "ageVerified", "updatedAt"]
+    },
+    "WalletAccount": {
+      "title": "WalletAccount",
+      "description": "User App Wallet balance summary (authoritative ledger-backed state).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "availableLamports": { "type": "integer" },
+        "lockedLamports": { "type": "integer" },
+        "pendingLamports": { "type": "integer" },
+        "totalWinningsLamports": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "availableLamports", "lockedLamports", "pendingLamports", "totalWinningsLamports", "updatedAt"]
+    },
+    "WalletLedgerEntry": {
+      "title": "WalletLedgerEntry",
+      "description": "Immutable auditable financial ledger entry for deposits, withdrawals, transfers, locks, and payouts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["deposit", "withdrawal", "app_fee", "transfer_out", "transfer_in", "escrow_lock", "escrow_payout", "escrow_refund"] },
+        "grossLamports": { "type": "integer" },
+        "appFeeLamports": { "type": "integer" },
+        "netLamports": { "type": "integer" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "failed", "expired"] },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128 },
+        "txSignature": { "type": "string", "maxLength": 128 },
+        "counterparty": { "type": "string", "maxLength": 128 },
+        "challengeId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "type", "grossLamports", "appFeeLamports", "netLamports", "status", "idempotencyKey", "createdAt"]
+    },
+    "Challenge": {
+      "title": "Challenge",
+      "description": "Peer-to-peer challenge backed by Solana PDA escrow.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "creatorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "creatorUsername": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "opponentId": { "type": "string", "maxLength": 128 },
+        "opponentUsername": { "type": "string", "maxLength": 32 },
+        "category": { "type": "string", "enum": ["sports", "location", "truth_or_dare", "movie_predictions", "other"] },
+        "title": { "type": "string", "minLength": 3, "maxLength": 140 },
+        "description": { "type": "string", "minLength": 5, "maxLength": 1200 },
+        "challengeType": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "rules": { "type": "string", "minLength": 3, "maxLength": 1200 },
+        "stakeLamports": { "type": "integer" },
+        "verificationMethod": { "type": "string", "enum": ["sports_feed", "geolocation_evidence", "participant_evidence", "admin_official_outcome"] },
+        "status": { "type": "string", "enum": ["Open", "Awaiting Acceptance", "Pending Deposit", "Active", "Awaiting Evidence", "Under Review", "Completed", "Won", "Lost", "Disputed", "Cancelled", "Refunded"] },
+        "escrowPda": { "type": "string", "maxLength": 64 },
+        "escrowTxSignature": { "type": "string", "maxLength": 128 },
+        "winnerId": { "type": "string", "maxLength": 128 },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "creatorId", "creatorUsername", "category", "title", "description", "challengeType", "rules", "stakeLamports", "verificationMethod", "status", "expiresAt", "createdAt", "updatedAt"]
+    },
+    "ChallengeEvidence": {
+      "title": "ChallengeEvidence",
+      "description": "Submitted proof or dispute evidence for a challenge.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "challengeId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "submitterId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "summary": { "type": "string", "minLength": 3, "maxLength": 1000 },
+        "mediaUrl": { "type": "string", "maxLength": 512 },
+        "locationLat": { "type": "number" },
+        "locationLng": { "type": "number" },
+        "isDispute": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "challengeId", "submitterId", "summary", "isDispute", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "1-to-1 private conversation header between two Veri-Fi users.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participantA": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "participantB": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "lastMessageText": { "type": "string", "maxLength": 280 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "participantA", "participantB", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Individual message inside a private conversation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "conversationId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "senderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "kind": { "type": "string", "enum": ["text", "image", "voice", "challenge_invite", "challenge_status", "evidence"] },
+        "body": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "mediaUrl": { "type": "string", "maxLength": 512 },
+        "challengeId": { "type": "string", "maxLength": 128 },
+        "readBy": { "type": "array" },
+        "reported": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "conversationId", "senderId", "kind", "body", "createdAt"]
+    },
+    "CategoryConfig": {
+      "title": "CategoryConfig",
+      "description": "Backend-enforced category availability (Casino and Poker disabled by default).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "enum": ["sports", "location", "truth_or_dare", "movie_predictions", "other", "casino", "poker"] },
+        "name": { "type": "string", "maxLength": 64 },
+        "enabled": { "type": "boolean" },
+        "comingSoon": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "enabled", "comingSoon", "updatedAt"]
+    },
+    "ReferralRecord": {
+      "title": "ReferralRecord",
+      "description": "Backend-validated referral relationship and points reward.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "referrerUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "referredUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "pointsAwarded": { "type": "integer" },
+        "milestone": { "type": "string", "enum": ["registered", "verified", "first_challenge"] },
+        "status": { "type": "string", "enum": ["pending", "credited"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "referrerUid", "referredUid", "pointsAwarded", "milestone", "status", "createdAt"]
+    },
+    "AdminAuditLog": {
+      "title": "AdminAuditLog",
+      "description": "Immutable record of privileged administrative actions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "adminUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "action": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "adminUid", "action", "details", "createdAt"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Global platform configuration including App Fee BPS and Treasury address.",
+      "type": "object",
+      "properties": {
+        "appFeeBps": { "type": "integer" },
+        "maxAppFeeBps": { "type": "integer" },
+        "treasuryAddress": { "type": "string", "maxLength": 64 },
+        "solanaCluster": { "type": "string", "enum": ["devnet"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["appFeeBps", "maxAppFeeBps", "treasuryAddress", "solanaCluster", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserPublic" },
+      "description": "Public user profiles for Social discovery."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivate" },
+      "description": "Owner-only isolated PII and responsible-use settings."
+    },
+    "/wallet_accounts/{userId}": {
+      "schema": { "$ref": "#/entities/WalletAccount" },
+      "description": "Veri-Fi App Wallet balances."
+    },
+    "/wallet_ledger/{entryId}": {
+      "schema": { "$ref": "#/entities/WalletLedgerEntry" },
+      "description": "Auditable App Wallet ledger entries."
+    },
+    "/challenges/{challengeId}": {
+      "schema": { "$ref": "#/entities/Challenge" },
+      "description": "Peer-to-peer challenges across Sports, Location, Truth or Dare, and Movie Predictions."
+    },
+    "/challenges/{challengeId}/evidence/{evidenceId}": {
+      "schema": { "$ref": "#/entities/ChallengeEvidence" },
+      "description": "Evidence and dispute submissions attached to a challenge."
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Private 1-to-1 conversation metadata."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Real-time private chat messages."
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/CategoryConfig" },
+      "description": "Category availability flags (Casino & Poker disabled by default)."
+    },
+    "/referrals/{referralId}": {
+      "schema": { "$ref": "#/entities/ReferralRecord" },
+      "description": "Referral milestones and earned points."
+    },
+    "/admin_audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AdminAuditLog" },
+      "description": "Administrative action audit trail."
+    },
+    "/app_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/AppSettings" },
+      "description": "Platform fee and Solana Devnet configuration."
+    }
+  }
+}

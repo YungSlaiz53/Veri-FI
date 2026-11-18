@@ -1,0 +1,1188 @@
+# VERI-FI — FINAL MASTER BUILD PROMPT
+
+## Project Identity
+
+**App Name:** Veri-Fi  
+**Tagline:** Bet. Chat. Win.  
+**Blockchain:** Solana  
+**Primary Network:** Solana Devnet during development and testing  
+**Frontend:** Next.js 15+, TypeScript, Tailwind CSS  
+**Smart Contracts:** Rust + Anchor Framework  
+**Database and Real-Time Services:** Firebase Authentication, Firestore, and Firebase Storage  
+**Wallet Support:** Phantom and Solflare  
+**AI Assistant:** VeriBot  
+
+---
+
+# 1. YOUR ROLE AND MAIN OBJECTIVE
+
+Act as a senior full-stack developer, Solana blockchain engineer, UI/UX designer, security engineer, database architect, and AI integration specialist.
+
+Build a complete, modern, production-structured application called **Veri-Fi**.
+
+Veri-Fi is a social betting and challenge platform where users can discover people, create friendly bets, challenge one another, chat privately, participate in different challenge categories, submit evidence, resolve outcomes, and securely receive winnings through Solana-powered escrow.
+
+The application should combine:
+
+- Social networking and user discovery.
+- Peer-to-peer challenges and friendly betting.
+- Secure Solana smart-contract escrow.
+- In-app wallet balances.
+- Private external wallet connections.
+- Automatic winner payouts after authorized resolution.
+- Private real-time messaging.
+- Referral rewards and points.
+- An AI assistant called VeriBot.
+- A complete administrative dashboard.
+
+Build an actual working application, not just a visual prototype.
+
+Do not remove existing working features, replace functional logic with mock data, or create buttons that do nothing.
+
+Where an external service requires credentials, build the complete integration structure, provide clear environment-variable instructions, and report exactly what still needs configuration.
+
+---
+
+# 2. IMPORTANT BLOCKCHAIN REQUIREMENTS
+
+Veri-Fi is built on **Solana, not Sui**.
+
+Use:
+
+- Solana blockchain.
+- Rust.
+- Anchor Framework.
+- Solana Program Derived Addresses (PDAs).
+- Solana Web3.js or the currently recommended compatible Solana JavaScript SDK.
+- Phantom Wallet Adapter or compatible wallet-standard integration.
+- Solflare wallet support.
+- Solana RPC.
+- Solana Devnet for development and testing.
+
+Do not use:
+
+- Sui.
+- Sui Move.
+- Sui SDK.
+- Sui GraphQL.
+- Sui-specific wallet integrations.
+- Sui-specific escrow or storage infrastructure.
+- Any previous blockchain implementation that conflicts with Solana.
+
+Solana must power the financial core of the application. It must not be used merely as a decorative wallet connection.
+
+All blockchain transactions must be verifiable through Solana Explorer.
+
+---
+
+# 3. BRANDING AND UI/UX DESIGN
+
+Create a premium, modern, futuristic social Web3 application.
+
+### Brand identity
+
+Use the Veri-Fi name and tagline:
+
+**VERI-FI — BET. CHAT. WIN.**
+
+Use the established Veri-Fi logo and visual identity where available.
+
+### Colour palette
+
+- Deep black and dark navy backgrounds.
+- Neon purple as the primary accent.
+- Electric blue as the secondary accent.
+- White for important text.
+- Light grey for secondary text.
+- Subtle gradients and controlled glow effects.
+
+### Design direction
+
+The interface should feel like a premium combination of a social application, gaming platform, and Web3 financial dashboard.
+
+Use:
+
+- Modern rounded cards.
+- Clean typography.
+- Smooth transitions.
+- Subtle hover and pressed effects.
+- Clear icons.
+- Responsive layouts.
+- Attractive empty states.
+- Loading skeletons.
+- Success and error notifications.
+- Accessible forms and navigation.
+- Consistent spacing and visual hierarchy.
+
+Make the application mobile-first while ensuring that it looks excellent on desktop and tablet.
+
+Do not overcrowd the interface.
+
+Use the same branding across the homepage, dashboard, wallet, betting pages, social pages, chat, and admin dashboard.
+
+---
+
+# 4. HOMEPAGE AND AUTHENTICATION
+
+Create a professional landing page that introduces Veri-Fi.
+
+Include:
+
+- Veri-Fi logo.
+- Bet. Chat. Win. tagline.
+- Short explanation of the platform.
+- How Veri-Fi works.
+- Main challenge categories.
+- Explanation of secure Solana escrow.
+- Explanation of the two wallet systems.
+- Register button.
+- Sign In button.
+- About Veri-Fi section.
+- Footer containing Terms, Privacy Policy, Responsible Use, and Support.
+
+### Registration
+
+Allow users to register using:
+
+- Full name.
+- Username.
+- Email address.
+- Password.
+- Password confirmation.
+
+Include secure authentication, email verification, password recovery, and session management.
+
+### Login
+
+Allow registered users to sign in securely.
+
+Support appropriate account verification and session protection.
+
+Users must not be able to access another user's private information or financial records.
+
+---
+
+# 5. MAIN USER DASHBOARD
+
+After login, users should enter a clean dashboard.
+
+Display:
+
+- Welcome message.
+- Profile picture and username.
+- Available App Wallet balance.
+- Locked balance.
+- Active bets.
+- Pending bets.
+- Total winnings.
+- Total completed challenges.
+- Referral points.
+- Recent activities.
+- Trending challenges.
+- Active users.
+- Recommended people to challenge.
+
+Create clear navigation to:
+
+1. Home.
+2. Explore.
+3. Categories.
+4. My Bets.
+5. Social.
+6. Messages.
+7. App Wallet.
+8. Referrals.
+9. Profile.
+10. About.
+11. Settings.
+
+Use real database information where available.
+
+Never present invented statistics as actual live user activity. Clearly identify demonstration data when demo data is necessary.
+
+---
+
+# 6. CHALLENGE CATEGORIES
+
+Create the following categories:
+
+### A. Sports
+
+Users can create and participate in sports-related predictions and challenges.
+
+Examples:
+
+- Football match predictions.
+- Basketball predictions.
+- Match outcomes.
+- Total goals.
+- Both teams to score.
+- Other supported sports markets.
+
+Allow administrators to upload and manage sports events, fixtures, teams, competitions, and available prediction markets.
+
+Use trusted sports data providers when configured.
+
+Do not fabricate live match information or results.
+
+### B. Location Challenges
+
+Allow users to create location-based challenges.
+
+Examples:
+
+- Who can reach a specified location first?
+- Who can complete a particular activity at a location?
+- Who can visit a designated landmark?
+
+Support appropriate location permissions, geolocation verification, timestamps, and evidence submission.
+
+Protect users' location privacy. Do not expose precise live locations publicly without permission.
+
+### C. Truth or Dare
+
+Allow users to challenge one another with truth-or-dare activities.
+
+Include:
+
+- Truth questions.
+- Dare challenges.
+- Custom challenges.
+- Challenge descriptions.
+- Evidence submission where appropriate.
+- Reporting and moderation.
+
+Prohibit dangerous, illegal, coercive, or inappropriate challenges.
+
+### D. Upcoming Movie Predictions
+
+Allow users to make predictions involving upcoming movies and movie characters.
+
+Examples:
+
+- Which character will survive?
+- Which character will betray another?
+- Who will win a particular fictional confrontation?
+- What will happen in an upcoming movie?
+
+Allow administrators to upload movie posters, descriptions, prediction questions, deadlines, and official outcomes.
+
+Clearly identify fictional predictions as entertainment.
+
+### E. Casino — COMING SOON
+
+Display the Casino category card on the dashboard.
+
+Show a clear **COMING SOON** label.
+
+This category must be disabled.
+
+Users must not be able to:
+
+- Open casino games.
+- Start casino sessions.
+- Place casino bets.
+- Deposit money into casino games.
+- Access casino gameplay routes.
+
+Do not build active casino functionality in this release.
+
+### F. Poker — COMING SOON
+
+Display the Poker category card with a **COMING SOON** label.
+
+This category must also be disabled.
+
+Users must not be able to:
+
+- Open poker tables.
+- Start poker games.
+- Join poker rooms.
+- Place poker bets.
+- Deposit funds for poker gameplay.
+
+Casino and Poker must remain visible but inaccessible until an authorized administrator officially enables their future release.
+
+Do not use hidden routes or direct URL access to bypass these restrictions. Enforce category availability on the backend as well as the frontend.
+
+---
+
+# 7. CREATE AND ACCEPT CHALLENGES
+
+Create a simple challenge creation process.
+
+A user should be able to:
+
+1. Select a category.
+2. Enter a challenge title.
+3. Write a description.
+4. Select the challenge type.
+5. Set the stake amount.
+6. Set relevant rules.
+7. Set an expiration time where appropriate.
+8. Select the outcome verification method.
+9. Publish the challenge.
+
+The challenge should appear in the appropriate public lobby or discovery section.
+
+Another user should be able to:
+
+1. View the challenge.
+2. Read the rules.
+3. View the stake amount.
+4. View the creator's profile.
+5. Click Accept Challenge.
+6. Match the required stake.
+7. Confirm the transaction.
+
+Once both players' stakes have been securely deposited and verified, mark the challenge as active.
+
+### Challenge statuses
+
+Support:
+
+- Open.
+- Awaiting Acceptance.
+- Pending Deposit.
+- Active.
+- Awaiting Evidence.
+- Under Review.
+- Completed.
+- Won.
+- Lost.
+- Disputed.
+- Cancelled.
+- Refunded.
+
+Do not allow users to change challenge rules after another participant has accepted unless both participants explicitly agree and the change is safely handled.
+
+A creator may cancel an open challenge and recover the refundable stake only when no challenger has joined and the contract's cancellation conditions are satisfied.
+
+---
+
+# 8. TWO-WALLET SYSTEM
+
+Implement two separate wallet systems.
+
+They must be clearly distinguished throughout the application.
+
+## A. VERI-FI APP WALLET
+
+Every registered user should have a Veri-Fi App Wallet.
+
+This is the user's in-app balance account.
+
+Users should be able to:
+
+- Deposit SOL from their private wallet.
+- View their available balance.
+- View their locked balance.
+- View pending deposits.
+- Use available balance to participate in challenges.
+- Receive challenge winnings automatically after authorized settlement.
+- Send SOL to another Veri-Fi App Wallet.
+- Receive SOL from another Veri-Fi App Wallet.
+- Withdraw SOL to their private wallet.
+- View their complete transaction history.
+
+### App Wallet dashboard
+
+Display:
+
+- Total balance.
+- Available balance.
+- Locked balance.
+- Pending balance.
+- Deposit button.
+- Withdraw button.
+- Send button.
+- Receive button.
+- Transaction history.
+
+Every balance movement must be reflected in an auditable financial ledger.
+
+Do not use localStorage or an ordinary frontend state variable as the source of financial truth.
+
+The backend must enforce balance updates, transaction validation, authorization, idempotency, reconciliation, and accounting controls.
+
+The application must prevent double spending, duplicate deposits, duplicate withdrawals, and unauthorized balance changes.
+
+## B. PRIVATE USER WALLET
+
+Allow users to connect external Solana wallets, including:
+
+- Phantom.
+- Solflare.
+
+Users should be able to:
+
+- Connect their private wallet.
+- Disconnect their wallet.
+- Verify wallet ownership through a signed message.
+- Deposit SOL into their Veri-Fi App Wallet.
+- Withdraw SOL from their App Wallet to their private wallet.
+- View their wallet address.
+- Open transaction details on Solana Explorer.
+
+Never request or store a user's seed phrase or private key.
+
+Never pretend that a wallet is connected when it is not.
+
+Never display a successful transaction until the transaction has been properly verified.
+
+---
+
+# 9. DEPOSITS AND INTERNAL WALLET TRANSFERS
+
+### Deposits
+
+When a user deposits SOL:
+
+1. The user connects their private wallet.
+2. The user enters the deposit amount.
+3. The application generates or displays the appropriate deposit instructions.
+4. The user approves the transaction in their wallet.
+5. The backend verifies the transaction signature and destination.
+6. The transaction is confirmed on Solana.
+7. The App Wallet ledger is credited exactly once.
+8. The transaction appears in the user's history.
+
+Handle pending, failed, expired, and confirmed transactions correctly.
+
+Do not credit unconfirmed deposits.
+
+### Internal transfers
+
+Allow users to send SOL from one Veri-Fi App Wallet to another.
+
+Require:
+
+- Recipient username or verified wallet account.
+- Transfer amount.
+- Confirmation screen.
+- Appropriate authentication.
+
+Validate available balance before allowing a transfer.
+
+Record the debit and credit as one atomic ledger operation.
+
+Prevent duplicate transfers and unauthorized recipient changes.
+
+---
+
+# 10. WITHDRAWALS AND THE 2% APP FEE
+
+Implement a withdrawal fee of **2%**, clearly named:
+
+**App Fee: 2%**
+
+This is an application fee, not a Solana network fee.
+
+When a user withdraws SOL from their Veri-Fi App Wallet to their private wallet:
+
+1. The user selects Withdraw.
+2. The user enters the withdrawal amount.
+3. The application calculates the 2% App Fee.
+4. The application displays the withdrawal breakdown.
+5. The user confirms the withdrawal.
+6. The withdrawal is processed through the authorized withdrawal system.
+7. The user receives the net amount.
+8. The App Fee is credited to the designated Veri-Fi Admin Treasury Wallet.
+9. The transaction records are updated after successful verification.
+
+### Example
+
+If a user requests a withdrawal of 1 SOL:
+
+- Withdrawal amount: 1.00 SOL.
+- App Fee (2%): 0.02 SOL.
+- Amount received: 0.98 SOL.
+
+Display the fee and net amount before the user confirms.
+
+The Solana network transaction fee is separate and must not be misrepresented as the App Fee.
+
+### Fee management
+
+Allow authorized administrators to configure the App Fee within predefined limits.
+
+Record:
+
+- Gross withdrawal amount.
+- App Fee.
+- Net withdrawal amount.
+- Recipient wallet.
+- Treasury destination.
+- Transaction signature.
+- Withdrawal status.
+- Timestamp.
+
+Never deduct a fee without displaying it before confirmation.
+
+Never credit treasury revenue before the corresponding transaction has succeeded.
+
+---
+
+# 11. SOLANA SMART CONTRACT ESCROW
+
+Build the actual Solana escrow program using Rust and Anchor.
+
+The escrow program is responsible for securely holding and releasing challenge stakes.
+
+Use Program Derived Addresses (PDAs) for challenge escrow accounts.
+
+### Required escrow flow
+
+1. Player A creates a challenge and deposits their stake.
+2. The Solana program locks the stake in the challenge's PDA escrow account.
+3. Player B accepts and deposits an equal stake.
+4. The contract verifies both deposits.
+5. The challenge becomes active.
+6. The outcome is resolved through the authorized resolution process.
+7. The contract releases the pooled funds according to its programmed rules.
+8. The winner's Veri-Fi App Wallet is credited only after confirmed settlement.
+
+### Example
+
+Player A stakes 1 SOL.
+
+Player B stakes 1 SOL.
+
+Total challenge pool: 2 SOL.
+
+If Player A wins after valid resolution:
+
+- The contract releases the eligible pool according to the agreed fee and settlement rules.
+- Player A receives the appropriate winnings in their Veri-Fi App Wallet.
+- Player B's stake is settled.
+- The transaction is recorded and linked to the challenge.
+
+Do not create a fake blockchain transaction or simply update a database balance to simulate settlement.
+
+### Required smart contract instructions
+
+Implement appropriate instructions for:
+
+- Initialize escrow.
+- Create challenge.
+- Deposit stake.
+- Accept challenge.
+- Match stake.
+- Activate challenge.
+- Resolve challenge.
+- Release payout.
+- Cancel eligible open challenge.
+- Refund under authorized conditions.
+- Handle disputes according to the contract's defined rules.
+
+Include:
+
+- PDA account validation.
+- Signer validation.
+- Ownership checks.
+- Reentrancy-resistant design appropriate to Solana.
+- Checked arithmetic.
+- Amount validation.
+- Duplicate instruction protection.
+- Challenge state validation.
+- Expiration checks.
+- Secure authority management.
+- Anchor account constraints.
+- Comprehensive tests.
+
+The contract must not allow an administrator to arbitrarily withdraw users' locked funds.
+
+---
+
+# 12. OUTCOME VERIFICATION AND DISPUTES
+
+Build a fair challenge-resolution system.
+
+Different categories may require different verification methods.
+
+Examples:
+
+- Sports: trusted sports results provider.
+- Location: appropriate location evidence and verification.
+- Truth or Dare: participant evidence and agreed rules.
+- Movie predictions: administrator-managed official outcome after the relevant release or event.
+
+Allow participants to submit evidence.
+
+Allow the other participant to review and respond.
+
+Support a dispute process.
+
+### Important AI restriction
+
+VeriBot may assist with:
+
+- Explaining rules.
+- Summarizing evidence.
+- Highlighting inconsistencies.
+- Organizing dispute information.
+- Suggesting a possible interpretation.
+
+VeriBot must never independently authorize an escrow payout or move funds.
+
+Only the authorized resolution mechanism should trigger the contract's settlement instructions.
+
+Implement explicit resolution authorization, evidence records, dispute states, and appropriate refund or timeout conditions.
+
+Do not silently release disputed funds.
+
+---
+
+# 13. SOCIAL NETWORK AND USER DISCOVERY
+
+Create a Social section where users can discover other Veri-Fi members.
+
+Include:
+
+- Search users by username.
+- Search by display name.
+- Suggested users.
+- Public profile previews.
+- Profile pictures.
+- User statistics.
+- Completed challenges.
+- Win/loss statistics where privacy settings permit.
+- Invite to Challenge button.
+- Message button.
+
+Allow users to control what profile information is public.
+
+Do not expose private financial records, private messages, email addresses, or sensitive personal information.
+
+---
+
+# 14. PRIVATE CHAT AND MESSAGING
+
+Build a complete real-time private messaging system.
+
+Use Firebase Firestore or another appropriate real-time service.
+
+Users should be able to chat privately after the appropriate interaction or challenge relationship is established.
+
+Support:
+
+- One-to-one conversations.
+- Text messages.
+- Image attachments.
+- Voice notes.
+- Message timestamps.
+- Read receipts.
+- Typing indicators.
+- Online/offline presence.
+- Message notifications.
+- Challenge invitation cards.
+- Challenge status cards.
+- Evidence sharing.
+- Message reporting.
+- Appropriate blocking and privacy controls.
+
+Use secure Firebase Storage rules.
+
+Validate uploaded files.
+
+Apply file-size and file-type restrictions.
+
+Protect private media access.
+
+Do not expose one user's conversations to another user.
+
+Synchronize conversations and message states in real time.
+
+---
+
+# 15. VERIBOT AI ASSISTANT
+
+Build a helpful AI assistant called **VeriBot**.
+
+VeriBot should be accessible from the dashboard and relevant challenge pages.
+
+Its purpose is to help users understand and use Veri-Fi.
+
+### VeriBot capabilities
+
+1. Explain how Veri-Fi works.
+2. Explain challenge rules.
+3. Help users write challenge titles and descriptions.
+4. Help users understand betting and challenge categories.
+5. Summarize long conversations when authorized.
+6. Help organize evidence.
+7. Explain transaction statuses.
+8. Explain App Wallet deposits and withdrawals.
+9. Explain the 2% App Fee.
+10. Help users navigate the platform.
+11. Provide responsible-use reminders.
+12. Explain common Solana wallet and transaction errors.
+13. Help users understand dispute procedures.
+
+### VeriBot security restrictions
+
+VeriBot must not:
+
+- Request private keys or seed phrases.
+- Sign transactions for users.
+- Transfer funds.
+- Modify App Wallet balances.
+- Access unauthorized user records.
+- Independently decide who wins.
+- Authorize smart-contract settlement.
+- Invent sports results.
+- Fabricate transaction confirmations.
+- Pretend to have verified evidence that it has not actually checked.
+
+VeriBot must use authorized application data and clearly communicate uncertainty.
+
+AI responses must never override the smart contract or the application's financial authorization rules.
+
+---
+
+# 16. REFERRAL AND REWARDS SYSTEM
+
+Create a complete referral system.
+
+Each user should receive a unique referral code and referral link.
+
+Users should be able to:
+
+- Copy their referral link.
+- Share their referral link.
+- View referred users.
+- View earned points.
+- View pending rewards.
+- View referral history.
+- View available redemption options.
+- Request eligible reward redemption.
+
+### Referral reward rules
+
+Allow configurable rewards for qualifying activities, such as:
+
+- Successful registration.
+- Completed account verification.
+- First eligible completed challenge.
+
+Prevent:
+
+- Self-referrals.
+- Duplicate accounts.
+- Fake registrations.
+- Referral farming.
+- Repeated reward claims.
+- Manipulation of points.
+
+Points must be calculated and stored securely on the backend.
+
+Do not rely on localStorage for reward balances.
+
+### Redemption
+
+Create a redemption catalogue and history page.
+
+Display available points, redemption requirements, request status, and previous redemptions.
+
+Do not promise cash or cryptocurrency conversion unless a legally compliant and properly implemented payment system supports it.
+
+---
+
+# 17. USER PROFILE AND SETTINGS
+
+Create a complete user profile page.
+
+Include:
+
+- Profile picture.
+- Full name.
+- Username.
+- Bio.
+- Joined date.
+- Completed challenges.
+- Public challenge statistics.
+- Referral code.
+- Connected wallet status.
+- Privacy settings.
+
+Allow users to update appropriate profile details.
+
+Create account settings for:
+
+- Password changes.
+- Email verification.
+- Notifications.
+- Privacy.
+- Connected wallets.
+- Blocked users.
+- Account security.
+- Account deletion requests.
+
+When deleting an account, preserve the financial, escrow, and audit records that must remain available for accounting, disputes, fraud prevention, and legal obligations.
+
+---
+
+# 18. ABOUT VERI-FI PAGE
+
+Create a dedicated About page.
+
+Explain:
+
+**What Veri-Fi does**
+
+Veri-Fi is a social betting and challenge platform where people can create friendly bets, challenge one another, communicate, compete, and securely settle eligible winnings.
+
+**How it works**
+
+Users create or accept challenges, match stakes, participate, submit evidence, and receive payouts after authorized resolution.
+
+**Why Solana**
+
+Explain that Solana powers the platform's escrow and transaction settlement through Rust and Anchor smart contracts.
+
+**Security**
+
+Explain that challenge funds are controlled by smart-contract escrow rather than being freely accessible to an administrator.
+
+Include relevant links to Solana and Solana Explorer.
+
+Do not make unsupported claims such as guaranteed winnings or absolute security.
+
+---
+
+# 19. ADMIN DASHBOARD
+
+Build a separate, secure administrative dashboard.
+
+Admin access must be enforced on the backend. Hiding admin buttons on the frontend is not sufficient.
+
+### Dashboard overview
+
+Display:
+
+- Total registered users.
+- Active users.
+- New registrations.
+- Total challenges.
+- Active challenges.
+- Completed challenges.
+- Disputes.
+- Deposit activity.
+- Withdrawal activity.
+- Total App Fees collected.
+- Referral activity.
+- Platform activity.
+
+Use real database information.
+
+### User management
+
+Allow authorized administrators to:
+
+- View registered users.
+- Search users.
+- View user account details.
+- Suspend users.
+- Restore suspended users.
+- Review reported accounts.
+- Review relevant account activity.
+- Process appropriate account deletion requests.
+
+Do not provide administrators with unrestricted access to users' private wallet keys or funds.
+
+### Content management
+
+Allow administrators to:
+
+- Create and edit sports events.
+- Upload sports images.
+- Manage sports markets.
+- Create location challenges.
+- Upload location challenge images.
+- Manage Truth or Dare prompts.
+- Upload upcoming movie posters.
+- Create movie prediction questions.
+- Publish content.
+- Schedule content.
+- Expire content.
+- Remove inappropriate content.
+- Manage category availability.
+
+### Casino and Poker controls
+
+Display Casino and Poker in the category management interface.
+
+Keep both disabled by default.
+
+Only an appropriately authorized administrator should be able to change their availability after the required product, legal, and security checks.
+
+Their availability must be enforced by the backend.
+
+### Financial administration
+
+Display:
+
+- Deposit records.
+- Withdrawal records.
+- App Wallet ledger.
+- Locked balances.
+- Escrow records.
+- Completed settlements.
+- Refunds.
+- App Fee revenue.
+- Treasury transactions.
+- Reconciliation status.
+
+Administrators must not be able to arbitrarily change financial balances or withdraw users' escrow funds.
+
+All privileged financial operations must follow controlled authorization procedures.
+
+### Audit logs
+
+Record important administrative actions, including:
+
+- User suspension and restoration.
+- Content publication and removal.
+- Category availability changes.
+- Fee configuration changes.
+- Dispute decisions.
+- Financial configuration changes.
+
+Record the administrator, action, timestamp, and relevant audit information.
+
+---
+
+# 20. DATABASE AND BACKEND ARCHITECTURE
+
+Use a structured backend with clear separation between application data and blockchain financial truth.
+
+Suggested collections or equivalent database structures:
+
+- users
+- user_profiles
+- wallet_accounts
+- wallet_connections
+- wallet_ledger
+- deposits
+- withdrawals
+- internal_transfers
+- challenges
+- challenge_participants
+- escrow_records
+- settlements
+- disputes
+- evidence
+- conversations
+- messages
+- notifications
+- referrals
+- referral_rewards
+- redemptions
+- sports_events
+- sports_markets
+- location_challenges
+- truth_or_dare_prompts
+- movie_predictions
+- categories
+- admin_users
+- admin_audit_logs
+- app_settings
+
+Enforce ownership and access rules.
+
+Validate all important operations on the server.
+
+Never trust client-supplied wallet balances, user roles, challenge outcomes, transaction statuses, or referral points.
+
+Use idempotency keys for financial operations.
+
+Use atomic database operations for ledger updates.
+
+Reconcile the internal ledger against verified on-chain transactions.
+
+Keep all sensitive credentials in server-side environment variables.
+
+---
+
+# 21. SECURITY REQUIREMENTS
+
+Security must be part of the implementation, not an afterthought.
+
+Implement:
+
+- Secure authentication.
+- Backend role-based authorization.
+- Input validation.
+- Zod or equivalent server-side validation.
+- Rate limiting.
+- CSRF protection where applicable.
+- Secure session handling.
+- HttpOnly cookies where appropriate.
+- Safe file uploads.
+- Firebase security rules.
+- Wallet-signature verification.
+- Transaction signature verification.
+- Idempotent financial processing.
+- Audit logging.
+- Anti-fraud checks.
+- Duplicate transaction prevention.
+- Protection against unauthorized balance changes.
+- Appropriate privacy controls.
+- Secure environment variable handling.
+
+Never expose private credentials in frontend code.
+
+Never trust an AI-generated result as financial authorization.
+
+Never allow an administrator to bypass smart-contract escrow protections.
+
+Do not claim a security audit has been completed unless an actual audit has been performed.
+
+---
+
+# 22. RESPONSIBLE USE AND LEGAL SAFEGUARDS
+
+Because Veri-Fi involves betting and financial transactions, include appropriate safeguards.
+
+Implement:
+
+- Age eligibility checks.
+- Jurisdiction restrictions where required.
+- Terms and conditions.
+- Privacy policy.
+- Responsible-use information.
+- User reporting.
+- Account suspension.
+- Dispute procedures.
+- Appropriate betting limits.
+- Self-exclusion controls where applicable.
+
+Real-money betting, casino, and poker features may require licensing and jurisdiction-specific legal approval.
+
+Do not activate restricted betting functionality without the required legal and operational approval.
+
+Casino and Poker remain Coming Soon and inaccessible in this release.
+
+---
+
+# 23. TESTING AND DEVELOPMENT REQUIREMENTS
+
+Build and test the application in stages.
+
+### Stage 1: Frontend and application structure
+
+Build the landing page, authentication, dashboard, profile, categories, social features, wallet interface, messages, and admin dashboard.
+
+### Stage 2: Backend
+
+Implement authentication, database structures, real-time messaging, content management, referral logic, and role-based access.
+
+### Stage 3: Solana integration
+
+Build the Anchor escrow program and integrate Phantom and Solflare.
+
+Deploy to Solana Devnet.
+
+### Stage 4: App Wallet
+
+Implement the internal financial ledger, deposits, withdrawals, transfers, transaction verification, and the 2% App Fee.
+
+### Stage 5: Challenge settlement
+
+Connect challenge creation, stake locking, acceptance, outcome authorization, escrow settlement, and App Wallet payout crediting.
+
+### Stage 6: VeriBot
+
+Integrate the AI assistant with appropriate permissions and security restrictions.
+
+### Stage 7: Testing
+
+Test:
+
+- Registration and login.
+- User permissions.
+- Profile updates.
+- Challenge creation.
+- Challenge acceptance.
+- Wallet connections.
+- Deposits.
+- Internal transfers.
+- Withdrawals.
+- 2% App Fee calculations.
+- Escrow locking.
+- Winner settlement.
+- Refund conditions.
+- Dispute handling.
+- Real-time messaging.
+- Evidence uploads.
+- Referral rewards.
+- Admin permissions.
+- Casino and Poker restrictions.
+
+Test financial operations against duplicate requests, failed transactions, pending confirmations, interrupted sessions, and unauthorized requests.
+
+Do not use real user funds during initial testing.
+
+---
+
+# 24. DEMO AND DEPLOYMENT REQUIREMENTS
+
+The first working version must run on Solana Devnet.
+
+Provide:
+
+- Complete source code.
+- Complete frontend.
+- Backend implementation.
+- Anchor program source code.
+- Database configuration.
+- Environment variable example file.
+- Deployment instructions.
+- Local development instructions.
+- Devnet testing instructions.
+- Smart-contract test results.
+- Transaction verification instructions.
+- Clear documentation.
+
+Use genuine Devnet transactions for blockchain demonstrations.
+
+If a service is not configured, clearly state what is missing.
+
+Never show a fake successful deposit, withdrawal, payout, or escrow transaction.
+
+Do not deploy to Solana Mainnet or move real funds without explicit authorization.
+
+---
+
+# 25. FINAL BUILD RULES
+
+Follow these rules throughout development:
+
+1. Build Veri-Fi as one connected application, not a collection of disconnected demo pages.
+2. Preserve the Veri-Fi brand identity.
+3. Use Solana and Anchor exclusively for blockchain escrow.
+4. Make the App Wallet and Private Wallet two clearly separate systems.
+5. Implement the 2% App Fee transparently.
+6. Use real server-side financial accounting.
+7. Use smart-contract escrow for challenge stakes.
+8. Credit winnings only after verified and authorized settlement.
+9. Never allow VeriBot to control funds or independently declare winners.
+10. Keep Casino and Poker visible but inaccessible with Coming Soon labels.
+11. Make all important buttons and actions functional.
+12. Do not use fake transaction confirmations.
+13. Do not replace real functionality with static mock data.
+14. Do not leave important features as TODOs or empty placeholders.
+15. Do not remove previously working features without a clear technical reason.
+16. Keep the interface responsive and accessible.
+17. Enforce security on the backend and smart contract, not just the frontend.
+18. Clearly document any external integration that requires credentials.
+19. Use Devnet for the complete initial blockchain demonstration.
+20. Do not activate real-money Mainnet functionality without explicit approval and the necessary legal and security reviews.
+
+## FINAL EXPECTATION
+
+Deliver a complete, polished, functional Veri-Fi application that brings together social interaction, friendly challenges, private messaging, AI assistance, referral rewards, two-wallet functionality, Solana PDA escrow, automatic authorized winner payouts, and a secure administrative system.
+
+The finished product should feel like a real Web3 social platform that users can navigate and use, not a static design or a collection of mock screens.
+
+**VERI-FI — BET. CHAT. WIN.**

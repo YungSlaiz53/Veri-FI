@@ -1,0 +1,417 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: default deny everything
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helper Primitives ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'blessedogle52@gmail.com'
+      );
+    }
+
+    // --- Validation Blueprints ---
+    function isValidUserPublic(data, userId) {
+      return data.keys().hasAll(['uid', 'username', 'displayName', 'showStats', 'completedChallenges', 'wins', 'losses', 'referralCode', 'status', 'joinedAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'username', 'displayName', 'bio', 'avatarUrl', 'showStats', 'completedChallenges', 'wins', 'losses', 'referralCode', 'status', 'isOnline', 'joinedAt', 'updatedAt'])
+        && data.uid == userId
+        && data.username is string && data.username.size() >= 3 && data.username.size() <= 32
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 64
+        && (!('bio' in data) || (data.bio is string && data.bio.size() <= 280))
+        && (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 512))
+        && data.showStats is bool
+        && data.completedChallenges is int && data.completedChallenges >= 0
+        && data.wins is int && data.wins >= 0
+        && data.losses is int && data.losses >= 0
+        && data.referralCode is string && data.referralCode.size() >= 4 && data.referralCode.size() <= 24
+        && data.status in ['active', 'suspended', 'deletion_requested']
+        && (!('isOnline' in data) || data.isOnline is bool)
+        && data.joinedAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivate(data, userId) {
+      return data.keys().hasAll(['uid', 'email', 'ageVerified', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'ageVerified', 'jurisdictionCode', 'dailyStakeLimitSol', 'selfExcludedUntil', 'blockedUserIds', 'connectedSolanaPubkey', 'walletVerified', 'updatedAt'])
+        && data.uid == userId
+        && data.email is string && data.email.size() <= 254
+        && data.ageVerified is bool
+        && (!('jurisdictionCode' in data) || (data.jurisdictionCode is string && data.jurisdictionCode.size() <= 16))
+        && (!('dailyStakeLimitSol' in data) || (data.dailyStakeLimitSol is number && data.dailyStakeLimitSol >= 0))
+        && (!('selfExcludedUntil' in data) || (data.selfExcludedUntil is string && data.selfExcludedUntil.size() <= 64))
+        && (!('blockedUserIds' in data) || (data.blockedUserIds is list && data.blockedUserIds.size() <= 200))
+        && (!('connectedSolanaPubkey' in data) || (data.connectedSolanaPubkey is string && data.connectedSolanaPubkey.size() <= 64))
+        && (!('walletVerified' in data) || data.walletVerified is bool)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidWalletAccount(data, userId) {
+      return data.keys().hasAll(['uid', 'availableLamports', 'lockedLamports', 'pendingLamports', 'totalWinningsLamports', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'availableLamports', 'lockedLamports', 'pendingLamports', 'totalWinningsLamports', 'updatedAt'])
+        && data.uid == userId
+        && data.availableLamports is int && data.availableLamports >= 0
+        && data.lockedLamports is int && data.lockedLamports >= 0
+        && data.pendingLamports is int && data.pendingLamports >= 0
+        && data.totalWinningsLamports is int && data.totalWinningsLamports >= 0
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidWalletLedger(data, entryId) {
+      return data.keys().hasAll(['id', 'uid', 'type', 'grossLamports', 'appFeeLamports', 'netLamports', 'status', 'idempotencyKey', 'createdAt'])
+        && data.keys().hasOnly(['id', 'uid', 'type', 'grossLamports', 'appFeeLamports', 'netLamports', 'status', 'idempotencyKey', 'txSignature', 'counterparty', 'challengeId', 'createdAt'])
+        && data.id == entryId
+        && isValidId(data.uid)
+        && data.type in ['deposit', 'withdrawal', 'app_fee', 'transfer_out', 'transfer_in', 'escrow_lock', 'escrow_payout', 'escrow_refund']
+        && data.grossLamports is int && data.grossLamports >= 0
+        && data.appFeeLamports is int && data.appFeeLamports >= 0
+        && data.netLamports is int && data.netLamports >= 0
+        && data.status in ['pending', 'confirmed', 'failed', 'expired']
+        && data.idempotencyKey is string && data.idempotencyKey.size() >= 8 && data.idempotencyKey.size() <= 128
+        && (!('txSignature' in data) || (data.txSignature is string && data.txSignature.size() <= 128))
+        && (!('counterparty' in data) || (data.counterparty is string && data.counterparty.size() <= 128))
+        && (!('challengeId' in data) || (data.challengeId is string && data.challengeId.size() <= 128))
+        && data.createdAt is timestamp;
+    }
+
+    function isValidChallenge(data, challengeId) {
+      return data.keys().hasAll(['id', 'creatorId', 'creatorUsername', 'category', 'title', 'description', 'challengeType', 'rules', 'stakeLamports', 'verificationMethod', 'status', 'expiresAt', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'creatorId', 'creatorUsername', 'opponentId', 'opponentUsername', 'category', 'title', 'description', 'challengeType', 'rules', 'stakeLamports', 'verificationMethod', 'status', 'escrowPda', 'escrowTxSignature', 'winnerId', 'expiresAt', 'createdAt', 'updatedAt'])
+        && data.id == challengeId
+        && isValidId(data.creatorId)
+        && data.creatorUsername is string && data.creatorUsername.size() >= 1 && data.creatorUsername.size() <= 32
+        && (!('opponentId' in data) || (data.opponentId is string && data.opponentId.size() <= 128))
+        && (!('opponentUsername' in data) || (data.opponentUsername is string && data.opponentUsername.size() <= 32))
+        && data.category in ['sports', 'location', 'truth_or_dare', 'movie_predictions']
+        && data.title is string && data.title.size() >= 3 && data.title.size() <= 140
+        && data.description is string && data.description.size() >= 5 && data.description.size() <= 1200
+        && data.challengeType is string && data.challengeType.size() >= 2 && data.challengeType.size() <= 64
+        && data.rules is string && data.rules.size() >= 3 && data.rules.size() <= 1200
+        && data.stakeLamports is int && data.stakeLamports > 0 && data.stakeLamports <= 100000000000
+        && data.verificationMethod in ['sports_feed', 'geolocation_evidence', 'participant_evidence', 'admin_official_outcome']
+        && data.status in ['Open', 'Awaiting Acceptance', 'Pending Deposit', 'Active', 'Awaiting Evidence', 'Under Review', 'Completed', 'Won', 'Lost', 'Disputed', 'Cancelled', 'Refunded']
+        && (!('escrowPda' in data) || (data.escrowPda is string && data.escrowPda.size() <= 64))
+        && (!('escrowTxSignature' in data) || (data.escrowTxSignature is string && data.escrowTxSignature.size() <= 128))
+        && (!('winnerId' in data) || (data.winnerId is string && data.winnerId.size() <= 128))
+        && data.expiresAt is timestamp
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidEvidence(data, evidenceId, challengeId) {
+      return data.keys().hasAll(['id', 'challengeId', 'submitterId', 'summary', 'isDispute', 'createdAt'])
+        && data.keys().hasOnly(['id', 'challengeId', 'submitterId', 'summary', 'mediaUrl', 'locationLat', 'locationLng', 'isDispute', 'createdAt'])
+        && data.id == evidenceId
+        && data.challengeId == challengeId
+        && isValidId(data.submitterId)
+        && data.summary is string && data.summary.size() >= 3 && data.summary.size() <= 1000
+        && (!('mediaUrl' in data) || (data.mediaUrl is string && data.mediaUrl.size() <= 512))
+        && (!('locationLat' in data) || data.locationLat is number)
+        && (!('locationLng' in data) || data.locationLng is number)
+        && data.isDispute is bool
+        && data.createdAt is timestamp;
+    }
+
+    function isValidConversation(data, conversationId) {
+      return data.keys().hasAll(['id', 'participantA', 'participantB', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'participantA', 'participantB', 'lastMessageText', 'updatedAt'])
+        && data.id == conversationId
+        && isValidId(data.participantA)
+        && isValidId(data.participantB)
+        && data.participantA != data.participantB
+        && (!('lastMessageText' in data) || (data.lastMessageText is string && data.lastMessageText.size() <= 280))
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidMessage(data, messageId, conversationId) {
+      return data.keys().hasAll(['id', 'conversationId', 'senderId', 'kind', 'body', 'createdAt'])
+        && data.keys().hasOnly(['id', 'conversationId', 'senderId', 'kind', 'body', 'mediaUrl', 'challengeId', 'readBy', 'reported', 'createdAt'])
+        && data.id == messageId
+        && data.conversationId == conversationId
+        && isValidId(data.senderId)
+        && data.kind in ['text', 'image', 'voice', 'challenge_invite', 'challenge_status', 'evidence']
+        && data.body is string && data.body.size() >= 1 && data.body.size() <= 2000
+        && (!('mediaUrl' in data) || (data.mediaUrl is string && data.mediaUrl.size() <= 512))
+        && (!('challengeId' in data) || (data.challengeId is string && data.challengeId.size() <= 128))
+        && (!('readBy' in data) || (data.readBy is list && data.readBy.size() <= 2))
+        && (!('reported' in data) || data.reported is bool)
+        && data.createdAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // Public User Profiles (no PII)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isSignedIn();
+      allow list: if isSignedIn() && resource.data.status == 'active';
+      allow create: if isValidId(userId) && isOwner(userId) && isVerifiedUser()
+        && isValidUserPublic(incoming(), userId)
+        && incoming().status == 'active'
+        && incoming().completedChallenges == 0
+        && incoming().wins == 0
+        && incoming().losses == 0
+        && incoming().joinedAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) && isSignedIn() && isValidUserPublic(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().joinedAt == existing().joinedAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (isOwner(userId) && isVerifiedUser()
+            && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'bio', 'avatarUrl', 'showStats', 'isOnline', 'status', 'updatedAt'])
+            && incoming().status in ['active', 'deletion_requested'])
+        );
+      allow delete: if false;
+
+      // Isolated PII & Security Settings
+      match /private/{docId} {
+        allow get: if isValidId(userId) && isValidId(docId) && (isOwner(userId) || isAdmin());
+        allow list: if false;
+        allow create: if isValidId(userId) && docId == 'info' && isOwner(userId) && isVerifiedUser()
+          && isValidUserPrivate(incoming(), userId)
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && docId == 'info' && (isOwner(userId) || isAdmin()) && isVerifiedUser()
+          && isValidUserPrivate(incoming(), userId)
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time;
+        allow delete: if false;
+      }
+    }
+
+    // App Wallet Accounts (strictly owner-readable; updates strictly bounded)
+    match /wallet_accounts/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId) && isOwner(userId) && isVerifiedUser()
+        && isValidWalletAccount(incoming(), userId)
+        && incoming().availableLamports == 0
+        && incoming().lockedLamports == 0
+        && incoming().pendingLamports == 0
+        && incoming().totalWinningsLamports == 0
+        && incoming().updatedAt == request.time;
+      allow update: if isAdmin() && isValidId(userId) && isValidWalletAccount(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Immutable Financial Ledger
+    match /wallet_ledger/{entryId} {
+      allow get: if isValidId(entryId) && (isSignedIn() && (existing().uid == request.auth.uid || isAdmin()));
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isValidId(entryId) && isVerifiedUser()
+        && isValidWalletLedger(incoming(), entryId)
+        && incoming().uid == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin() && isValidId(entryId) && isValidWalletLedger(incoming(), entryId)
+        && incoming().id == existing().id
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt;
+      allow delete: if false;
+    }
+
+    // Challenges (Casino & Poker strictly blocked)
+    match /challenges/{challengeId} {
+      allow get: if isValidId(challengeId) && isSignedIn();
+      allow list: if isSignedIn() && resource.data.category in ['sports', 'location', 'truth_or_dare', 'movie_predictions'];
+      allow create: if isValidId(challengeId) && isVerifiedUser()
+        && isValidChallenge(incoming(), challengeId)
+        && incoming().creatorId == request.auth.uid
+        && incoming().status in ['Open', 'Awaiting Acceptance', 'Pending Deposit']
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(challengeId) && isSignedIn() && isValidChallenge(incoming(), challengeId)
+        && incoming().id == existing().id
+        && incoming().creatorId == existing().creatorId
+        && incoming().stakeLamports == existing().stakeLamports
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            !(existing().status in ['Completed', 'Won', 'Lost', 'Cancelled', 'Refunded']) && (
+              // Action: Accept open challenge
+              (isVerifiedUser()
+                && existing().status in ['Open', 'Awaiting Acceptance']
+                && existing().creatorId != request.auth.uid
+                && incoming().opponentId == request.auth.uid
+                && incoming().status == 'Active'
+                && incoming().diff(existing()).affectedKeys().hasOnly(['opponentId', 'opponentUsername', 'status', 'escrowPda', 'escrowTxSignature', 'updatedAt'])) ||
+              // Action: Creator cancels open challenge before anyone joins
+              (isVerifiedUser()
+                && existing().creatorId == request.auth.uid
+                && existing().status in ['Open', 'Awaiting Acceptance']
+                && !('opponentId' in existing())
+                && incoming().status == 'Cancelled'
+                && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+              // Action: Participant submits evidence or raises dispute
+              (isVerifiedUser()
+                && (existing().creatorId == request.auth.uid || existing().opponentId == request.auth.uid)
+                && existing().status in ['Active', 'Awaiting Evidence', 'Under Review']
+                && incoming().status in ['Awaiting Evidence', 'Under Review', 'Disputed']
+                && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']))
+            )
+          )
+        );
+      allow delete: if false;
+
+      match /evidence/{evidenceId} {
+        allow get: if isValidId(challengeId) && isValidId(evidenceId) && isSignedIn()
+          && (
+            isAdmin() ||
+            get(/databases/$(database)/documents/challenges/$(challengeId)).data.creatorId == request.auth.uid ||
+            get(/databases/$(database)/documents/challenges/$(challengeId)).data.opponentId == request.auth.uid
+          );
+        allow list: if isSignedIn() && (resource.data.submitterId == request.auth.uid || isAdmin());
+        allow create: if isValidId(challengeId) && isValidId(evidenceId) && isVerifiedUser()
+          && isValidEvidence(incoming(), evidenceId, challengeId)
+          && incoming().submitterId == request.auth.uid
+          && incoming().createdAt == request.time
+          && exists(/databases/$(database)/documents/challenges/$(challengeId))
+          && (
+            get(/databases/$(database)/documents/challenges/$(challengeId)).data.creatorId == request.auth.uid ||
+            get(/databases/$(database)/documents/challenges/$(challengeId)).data.opponentId == request.auth.uid
+          );
+        allow update, delete: if false;
+      }
+    }
+
+    // Private 1-to-1 Conversations & Messages
+    match /conversations/{conversationId} {
+      allow get: if isValidId(conversationId) && isSignedIn()
+        && (existing().participantA == request.auth.uid || existing().participantB == request.auth.uid);
+      allow list: if isSignedIn()
+        && (resource.data.participantA == request.auth.uid || resource.data.participantB == request.auth.uid);
+      allow create: if isValidId(conversationId) && isVerifiedUser()
+        && isValidConversation(incoming(), conversationId)
+        && (incoming().participantA == request.auth.uid || incoming().participantB == request.auth.uid)
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(conversationId) && isVerifiedUser()
+        && isValidConversation(incoming(), conversationId)
+        && (existing().participantA == request.auth.uid || existing().participantB == request.auth.uid)
+        && incoming().participantA == existing().participantA
+        && incoming().participantB == existing().participantB
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['lastMessageText', 'updatedAt']);
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow get: if isValidId(conversationId) && isValidId(messageId) && isSignedIn()
+          && (
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantA == request.auth.uid ||
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantB == request.auth.uid
+          );
+        allow list: if isSignedIn() && (
+          resource.data.senderId == request.auth.uid || isAdmin()
+        );
+        allow create: if isValidId(conversationId) && isValidId(messageId) && isVerifiedUser()
+          && isValidMessage(incoming(), messageId, conversationId)
+          && incoming().senderId == request.auth.uid
+          && incoming().createdAt == request.time
+          && exists(/databases/$(database)/documents/conversations/$(conversationId))
+          && (
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantA == request.auth.uid ||
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantB == request.auth.uid
+          );
+        allow update: if isValidId(conversationId) && isValidId(messageId) && isVerifiedUser()
+          && isValidMessage(incoming(), messageId, conversationId)
+          && (
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantA == request.auth.uid ||
+            get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantB == request.auth.uid
+          )
+          && incoming().id == existing().id
+          && incoming().conversationId == existing().conversationId
+          && incoming().senderId == existing().senderId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['readBy', 'reported']);
+        allow delete: if false;
+      }
+    }
+
+    // Categories, Admin Content, & Platform Config
+    match /categories/{categoryId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /sports_events/{eventId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin() && isValidId(eventId);
+    }
+
+    match /movie_predictions/{movieId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin() && isValidId(movieId);
+    }
+
+    match /location_challenges/{locId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin() && isValidId(locId);
+    }
+
+    match /truth_or_dare_prompts/{promptId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin() && isValidId(promptId);
+    }
+
+    match /referrals/{referralId} {
+      allow get: if isValidId(referralId) && isSignedIn() && (existing().referrerUid == request.auth.uid || existing().referredUid == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.referrerUid == request.auth.uid || isAdmin());
+      allow create: if isValidId(referralId) && isVerifiedUser()
+        && incoming().referredUid == request.auth.uid
+        && incoming().referrerUid != request.auth.uid
+        && incoming().pointsAwarded is int && incoming().pointsAwarded >= 0 && incoming().pointsAwarded <= 500
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && isOwner(adminId);
+      allow list, create, update, delete: if false;
+    }
+
+    match /admin_audit_logs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin() && isValidId(logId) && incoming().adminUid == request.auth.uid && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    match /app_settings/{settingId} {
+      allow get: if isValidId(settingId) && isSignedIn();
+      allow list: if false;
+      allow create, update: if isAdmin() && isValidId(settingId);
+      allow delete: if false;
+    }
+  }
+}
